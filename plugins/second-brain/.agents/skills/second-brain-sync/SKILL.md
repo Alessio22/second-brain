@@ -11,6 +11,7 @@ Run these to understand the current state before doing anything:
 cat .claude/second-brain.json 2>/dev/null || echo "MISSING"   # config
 git status --porcelain   # uncommitted changes
 git rev-parse HEAD 2>/dev/null || echo "none"   # current commit
+git branch --show-current 2>/dev/null   # current branch
 date +%F   # today's date
 ls docs/superpowers/specs/ 2>/dev/null || echo "none"   # superpowers specs in repo
 ls docs/superpowers/plans/ 2>/dev/null || echo "none"   # superpowers plans in repo
@@ -35,6 +36,7 @@ Otherwise parse it for `project`, `app`, `knowledgeBasePath`, and `lastSync` (wh
   - If `lastSync` is `null` (first sync), run `git log -10 --oneline` and `git diff HEAD --stat` for a rough picture, leaning more on conversation context.
 - **New superpowers artifacts**: compare the "Superpowers specs/plans in repo" filenames from Step 0 against what's already in `<knowledgeBasePath>/specs/` and `<knowledgeBasePath>/plans/` (run `ls` on those two folders). Any filename present in the repo lists but not in the knowledge base lists is "new". If the repo has no `docs/superpowers/` folder, skip this — it just means no superpowers artifacts to copy.
 - **New session scripts**: from the "Git status" output from Step 0, find untracked (`??`) files whose name ends in `.sh`, `.bash`, `.py`, `.rb`, `.js`, `.mjs`, `.ts`, `.ps1`, or `.pl`. Compare their basenames against what's already in `<knowledgeBasePath>/scripts/` (run `ls` on that folder). Any whose basename isn't there yet is a "new" script to copy.
+- **Current branch**: from the "current branch" output in Step 0. If empty (detached HEAD), use `(detached HEAD at <short-sha>)`, where `<short-sha>` is the first 7 characters of the "current commit" from Step 0. This goes into the "Branch" line of Handoff.
 - **Handoff for the next session**: based on the conversation, determine the current status of the work (`done`, `in progress`, or `blocked`), the immediate next steps if any, and any open questions or blockers. This is what lets someone resume this work in a future session without re-reading the whole conversation.
 - **Continuation link**: if this conversation began with the second-brain-resume skill loading a previous session report, note that report's date, topic, and filename — the new report should link back to it as "Continues from".
 
@@ -109,6 +111,7 @@ Target file: `<knowledgeBasePath>/sessions/<date>-<slug>.md`.
 ## Handoff / Next steps
 
 - Status: <done | in progress | blocked>
+- Branch: <current branch from step 2, or its detached-HEAD form>
 - Next steps: <what to pick up first in the next session, or "None — work is complete.">
 - Open questions / blockers: <anything unresolved, or "None.">
 ```

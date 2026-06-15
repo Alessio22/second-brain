@@ -9,6 +9,7 @@ Run this to understand the current state before doing anything:
 
 ```bash
 cat .claude/second-brain.json 2>/dev/null || echo "MISSING"   # config
+git branch --show-current 2>/dev/null   # current branch
 ```
 
 ## Your task
@@ -46,6 +47,18 @@ Present the entries from `## Open Items` as a numbered list (feature, status, da
 - Read the `### <Feature>` section in `FUNCTIONAL-<app>.md` for the current overall description of that feature.
 - If this report itself starts with a "Continues from" line, you may also skim the linked earlier session for additional background.
 
+### 4b. Check the recorded branch
+
+The loaded session report's "Handoff / Next steps" section may contain a `- Branch:` line (older reports may not — skip this step if absent).
+
+Compare it to the "current branch" output from Step 0.
+
+- If they match, no action needed.
+- If they differ:
+  - Check whether the recorded branch still exists locally: `git branch --list <branch>`. If it's gone, tell the user the original branch (`<branch>`) no longer exists — probably merged or deleted — and move on.
+  - If it exists, check `git status --porcelain`. If there are uncommitted changes, tell the user this session was on branch `<branch>` but they have local changes on the current branch — they should commit or stash those before switching, and don't offer a checkout.
+  - If it exists and the working tree is clean, ask the user whether to switch to `<branch>` now. If yes, run `git checkout <branch>`.
+
 ### 5. Check for staleness
 
 From the "Code changes" section of the session report, collect the file paths touched. Run:
@@ -62,6 +75,7 @@ Summarize for the user, in a few sentences:
 - What this session was about and what was already done.
 - The current status (`in progress` / `blocked`).
 - The "Next steps" and "Open questions / blockers" from the session's "Handoff / Next steps" section.
+- Any branch-switch result from step 4b.
 - Any staleness warning from step 5.
 
 Then ask if they'd like to continue with those next steps now.

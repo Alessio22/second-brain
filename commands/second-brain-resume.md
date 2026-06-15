@@ -5,6 +5,7 @@ description: Resume an in-progress or blocked session from the second-brain know
 ## Context
 
 - Config: !`cat .claude/second-brain.json 2>/dev/null || echo "MISSING"`
+- Current branch: !`git branch --show-current 2>/dev/null`
 
 ## Your task
 
@@ -41,6 +42,18 @@ Present the entries from `## Open Items` as a list (feature, status, date/topic)
 - Read the `### <Feature>` section in `FUNCTIONAL-<app>.md` for the current overall description of that feature.
 - If this report itself starts with a "Continues from" line, you may also skim the linked earlier session for additional background.
 
+### 4b. Check the recorded branch
+
+The loaded session report's "Handoff / Next steps" section may contain a `- Branch:` line (older reports may not — skip this step if absent).
+
+Compare it to "Current branch" from the Context above.
+
+- If they match, no action needed.
+- If they differ:
+  - Check whether the recorded branch still exists locally: `git branch --list <branch>`. If it's gone, tell the user the original branch (`<branch>`) no longer exists — probably merged or deleted — and move on.
+  - If it exists, check `git status --porcelain`. If there are uncommitted changes, tell the user this session was on branch `<branch>` but they have local changes on the current branch — they should commit or stash those before switching, and don't offer a checkout.
+  - If it exists and the working tree is clean, use AskUserQuestion to ask whether to switch to `<branch>` now. If yes, run `git checkout <branch>`.
+
 ### 5. Check for staleness
 
 From the "Code changes" section of the session report, collect the file paths touched. Run:
@@ -57,6 +70,7 @@ Summarize for the user, in a few sentences:
 - What this session was about and what was already done.
 - The current status (`in progress` / `blocked`).
 - The "Next steps" and "Open questions / blockers" from the session's "Handoff / Next steps" section.
+- Any branch-switch result from step 4b.
 - Any staleness warning from step 5.
 
 Then ask if they'd like to continue with those next steps now.
