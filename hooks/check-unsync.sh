@@ -28,6 +28,10 @@ if [ -n "$HEAD_COMMIT" ] && [ "$HEAD_COMMIT" != "$LAST_SYNC_COMMIT" ]; then
   UNSYNCED=true
 fi
 
+if [ -n "$(git -C "$CWD" status --porcelain 2>/dev/null)" ]; then
+  UNSYNCED=true
+fi
+
 if [ "$UNSYNCED" = true ]; then
   touch "$MARKER"
   jq -n '{additionalContext: "Hai lavoro non sincronizzato nel second brain (nuovi commit, modifiche non committate, o nuove spec/piani superpowers). Valuta di eseguire /second-brain-sync prima di chiudere la sessione."}'

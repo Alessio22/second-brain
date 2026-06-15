@@ -36,6 +36,10 @@ setup_repo() {
   git -C "$dir" init -q
   git -C "$dir" config user.email "test@example.com"
   git -C "$dir" config user.name "Test"
+  # .claude/ is gitignored in real repos (per second-brain.json invariants), so
+  # writing the config there shouldn't itself register as an uncommitted change.
+  # Use the local exclude file so this doesn't add any tracked/untracked files.
+  echo ".claude/" >> "$dir/.git/info/exclude"
   echo "$dir"
 }
 
@@ -103,6 +107,20 @@ run_hook "$dir" "$sid" > /dev/null
 output=$(run_hook "$dir" "$sid")
 assert_no_output "second call same session => silent" "$output"
 rm -f "/tmp/second-brain-reminded-$sid"
+rm -rf "$dir" "$kb"
+
+# Test: HEAD == lastSync.commit but uncommitted changes exist => reminder
+dir=$(setup_repo)
+echo "hello" > "$dir/file.txt"
+git -C "$dir" add file.txt
+git -C "$dir" commit -q -m "init"
+head=$(git -C "$dir" rev-parse HEAD)
+echo "more" >> "$dir/file.txt"
+kb=$(mktemp -d)
+write_config "$dir" "$head" "$kb"
+output=$(run_hook "$dir" "session-$$-5")
+assert_reminder "uncommitted changes => reminder" "$output"
+rm -f "/tmp/second-brain-reminded-session-$$-5"
 rm -rf "$dir" "$kb"
 
 if [ "$FAILURES" -eq 0 ]; then
