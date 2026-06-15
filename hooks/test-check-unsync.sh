@@ -128,10 +128,12 @@ dir=$(setup_repo)
 echo "hello" > "$dir/file.txt"
 git -C "$dir" add file.txt
 git -C "$dir" commit -q -m "init"
-head=$(git -C "$dir" rev-parse HEAD)
 kb=$(mktemp -d)
 mkdir -p "$dir/docs/superpowers/specs" "$kb/specs"
 echo "spec" > "$dir/docs/superpowers/specs/new-spec.md"
+git -C "$dir" add docs/superpowers/specs/new-spec.md
+git -C "$dir" commit -q -m "add spec"
+head=$(git -C "$dir" rev-parse HEAD)
 write_config "$dir" "$head" "$kb"
 output=$(run_hook "$dir" "session-$$-6")
 assert_reminder "new uncopied spec => reminder" "$output"
