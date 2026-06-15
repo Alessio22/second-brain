@@ -59,6 +59,29 @@ output=$(run_hook "$dir" "session-$$-1")
 assert_no_output "no config => silent" "$output"
 rm -rf "$dir"
 
+# Test: new commit since lastSync=null => reminder
+dir=$(setup_repo)
+echo "hello" > "$dir/file.txt"
+git -C "$dir" add file.txt
+git -C "$dir" commit -q -m "init"
+kb=$(mktemp -d)
+write_config "$dir" "" "$kb"
+output=$(run_hook "$dir" "session-$$-2")
+assert_reminder "new commit since lastSync=null => reminder" "$output"
+rm -rf "$dir" "$kb"
+
+# Test: HEAD == lastSync.commit, no other changes => silent
+dir=$(setup_repo)
+echo "hello" > "$dir/file.txt"
+git -C "$dir" add file.txt
+git -C "$dir" commit -q -m "init"
+head=$(git -C "$dir" rev-parse HEAD)
+kb=$(mktemp -d)
+write_config "$dir" "$head" "$kb"
+output=$(run_hook "$dir" "session-$$-3")
+assert_no_output "synced state => silent" "$output"
+rm -rf "$dir" "$kb"
+
 if [ "$FAILURES" -eq 0 ]; then
   echo "All tests passed."
   exit 0
