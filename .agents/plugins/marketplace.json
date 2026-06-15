@@ -7,6 +7,7 @@
     {
       "name": "second-brain",
       "source": {
+        "source": "local",
         "path": "./"
       },
       "description": "Turn superpowers specs, plans, and session decisions into a portable, linked second-brain knowledge base per project."
