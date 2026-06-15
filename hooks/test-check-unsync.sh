@@ -123,6 +123,21 @@ assert_reminder "uncommitted changes => reminder" "$output"
 rm -f "/tmp/second-brain-reminded-session-$$-5"
 rm -rf "$dir" "$kb"
 
+# Test: synced state, but a new spec hasn't been copied to the knowledge base => reminder
+dir=$(setup_repo)
+echo "hello" > "$dir/file.txt"
+git -C "$dir" add file.txt
+git -C "$dir" commit -q -m "init"
+head=$(git -C "$dir" rev-parse HEAD)
+kb=$(mktemp -d)
+mkdir -p "$dir/docs/superpowers/specs" "$kb/specs"
+echo "spec" > "$dir/docs/superpowers/specs/new-spec.md"
+write_config "$dir" "$head" "$kb"
+output=$(run_hook "$dir" "session-$$-6")
+assert_reminder "new uncopied spec => reminder" "$output"
+rm -f "/tmp/second-brain-reminded-session-$$-6"
+rm -rf "$dir" "$kb"
+
 if [ "$FAILURES" -eq 0 ]; then
   echo "All tests passed."
   exit 0
