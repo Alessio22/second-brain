@@ -18,8 +18,8 @@ CONFIG="$CWD/.claude/second-brain.json"
 MARKER="/tmp/second-brain-reminded-$SESSION_ID"
 [ -f "$MARKER" ] && exit 0
 
-LAST_SYNC_COMMIT=$(jq -r '.lastSync.commit // empty' "$CONFIG")
-KB_PATH=$(jq -r '.knowledgeBasePath // empty' "$CONFIG")
+LAST_SYNC_COMMIT=$(jq -r '.lastSync.commit // empty' "$CONFIG" 2>/dev/null)
+KB_PATH=$(jq -r '.knowledgeBasePath // empty' "$CONFIG" 2>/dev/null)
 
 UNSYNCED=false
 
