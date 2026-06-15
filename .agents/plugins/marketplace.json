@@ -1,16 +1,21 @@
 {
   "name": "second-brain",
-  "owner": {
-    "name": "Alessio Canestrelli"
+  "interface": {
+    "displayName": "Second Brain"
   },
   "plugins": [
     {
       "name": "second-brain",
       "source": {
         "source": "local",
-        "path": "./"
+        "path": "./plugins/second-brain"
       },
-      "description": "Turn superpowers specs, plans, and session decisions into a portable, linked second-brain knowledge base per project."
+      "description": "Turn superpowers specs, plans, and session decisions into a portable, linked second-brain knowledge base per project.",
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
     }
   ]
 }

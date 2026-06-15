@@ -5,9 +5,5 @@
   "author": {
     "name": "Alessio Canestrelli"
   },
-  "skills": [
-    ".agents/skills/second-brain-init",
-    ".agents/skills/second-brain-sync",
-    ".agents/skills/second-brain-resume"
-  ]
+  "skills": "./.agents/skills/"
 }

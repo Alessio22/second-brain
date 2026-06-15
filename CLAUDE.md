@@ -15,9 +15,9 @@ There is no application code, build step, linter, or test suite — the entire "
 - `commands/second-brain-init.md` — `/second-brain-init`, one-time per-repo setup.
 - `commands/second-brain-sync.md` — `/second-brain-sync`, run at checkpoints to record session work.
 - `commands/second-brain-resume.md` — `/second-brain-resume`, picks up an in-progress or blocked session.
-- `.codex-plugin/plugin.json` — Codex plugin manifest (name, version, description, author, and the `skills` it bundles).
-- `.agents/plugins/marketplace.json` — Codex marketplace listing so this repo can be added via `/plugin marketplace add` + `/plugin install`.
-- `.agents/skills/second-brain-init/SKILL.md`, `.agents/skills/second-brain-sync/SKILL.md`, and `.agents/skills/second-brain-resume/SKILL.md` — Codex CLI [Agent Skills](https://developers.openai.com/codex/custom-prompts) versions of the same three commands, referenced by `.codex-plugin/plugin.json`. Functionally equivalent to the `commands/*.md` files but without Claude-specific frontmatter or `!`command`` context injection — the skill body tells the agent to run the context-gathering commands itself as "Step 0". Keep these in sync with `commands/*.md` when updating the workflow.
+- `.agents/plugins/marketplace.json` — Codex marketplace listing so this repo can be added via `codex plugin marketplace add` + `codex plugin add`. Points at `./plugins/second-brain` as the plugin source.
+- `plugins/second-brain/.codex-plugin/plugin.json` — Codex plugin manifest (name, version, description, author, and a `skills` path pointing to `./.agents/skills/`).
+- `plugins/second-brain/.agents/skills/second-brain-init/SKILL.md`, `.../second-brain-sync/SKILL.md`, and `.../second-brain-resume/SKILL.md` — Codex CLI [Agent Skills](https://developers.openai.com/codex/custom-prompts) versions of the same three commands, referenced by `plugins/second-brain/.codex-plugin/plugin.json`. Functionally equivalent to the `commands/*.md` files but without Claude-specific frontmatter or `!`command`` context injection — the skill body tells the agent to run the context-gathering commands itself as "Step 0". Keep these in sync with `commands/*.md` when updating the workflow.
 - `docs/superpowers/specs/` and `docs/superpowers/plans/` — this repo's own superpowers design spec and plan for the plugin itself (dogfooding the workflow these commands support).
 
 ## Architecture: the three commands
