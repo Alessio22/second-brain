@@ -109,9 +109,15 @@ Target file: `<knowledgeBasePath>/sessions/<date>-<slug>.md`.
 <same Summary / Decisions & rationale / Superpowers artifacts / Code changes / Handoff structure, covering only what's new since the previous entry today>
 ```
 
-### 5. Update FUNCTIONAL.md
+### 5. Update the functional overview file
 
-Read `<knowledgeBasePath>/FUNCTIONAL.md`.
+The functional overview file is `<knowledgeBasePath>/FUNCTIONAL-<app>.md`. If it doesn't exist yet but a legacy `<knowledgeBasePath>/FUNCTIONAL.md` does (from before this file was renamed to include the app name), migrate it first:
+
+```bash
+cd "<knowledgeBasePath>" && (git mv FUNCTIONAL.md "FUNCTIONAL-<app>.md" 2>/dev/null || mv FUNCTIONAL.md "FUNCTIONAL-<app>.md")
+```
+
+Read `<knowledgeBasePath>/FUNCTIONAL-<app>.md`.
 
 For each feature/module touched this session:
 
@@ -123,17 +129,17 @@ For each feature/module touched this session:
   4. `- Plan: [<title>](plans/<filename>)` — same rule as spec.
   5. `- Last session: [<date> - <topic>](sessions/<filename>)` — always point to the session report from step 4, replacing any previous "Last session" line for this feature.
 
-Only the latest session link per feature is kept in `FUNCTIONAL.md`; remove older ones (they remain reachable in the `sessions/` folder).
+Only the latest session link per feature is kept in `FUNCTIONAL-<app>.md`; remove older ones (they remain reachable in the `sessions/` folder).
 
 ### 5b. Rebuild the Open Items section
 
-Regenerate the `## Open Items` section (positioned after `## Stack & Architecture` and before `## Modules / Features` — add it there if it doesn't exist yet, e.g. in a `FUNCTIONAL.md` written before this section existed):
+Regenerate the `## Open Items` section (positioned after `## Stack & Architecture` and before `## Modules / Features` — add it there if it doesn't exist yet, e.g. in a `FUNCTIONAL-<app>.md` written before this section existed):
 
 - Scan **all** `### <Feature>` sections (not just the ones touched this sync) for their `- Status:` and `- Last session:` lines.
 - For each feature whose status is `in progress` or `blocked`, add a line: `- [<status>] <Feature> — [<date> - <topic>](sessions/<filename>)` (reuse that feature's "Last session" link).
 - If no feature is `in progress` or `blocked`, write a single line: "No open items — all tracked features are up to date."
 
-Write the updated `FUNCTIONAL.md` back.
+Write the updated `FUNCTIONAL-<app>.md` back.
 
 ### 6. Update the config
 
@@ -162,4 +168,4 @@ rm "docs/superpowers/plans/<file>"
 
 ### 8. Report
 
-Summarize for the user: the session report path written, which `FUNCTIONAL.md` sections were updated, and which files were copied (and deleted, if any).
+Summarize for the user: the session report path written, which `FUNCTIONAL-<app>.md` sections were updated, and which files were copied (and deleted, if any).

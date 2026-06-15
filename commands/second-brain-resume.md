@@ -18,9 +18,15 @@ Otherwise parse it for `project`, `app`, and `knowledgeBasePath`.
 
 ### 2. Find incomplete sessions
 
-Read `<knowledgeBasePath>/FUNCTIONAL.md` and find the `## Open Items` section.
+The functional overview file is `<knowledgeBasePath>/FUNCTIONAL-<app>.md`. If it doesn't exist yet but a legacy `<knowledgeBasePath>/FUNCTIONAL.md` does (from before this file was renamed to include the app name), migrate it first:
 
-- If the section doesn't exist (an older `FUNCTIONAL.md` from before this section was introduced), tell the user to run `/second-brain-sync` once — it will add the section — and stop here.
+```bash
+cd "<knowledgeBasePath>" && (git mv FUNCTIONAL.md "FUNCTIONAL-<app>.md" 2>/dev/null || mv FUNCTIONAL.md "FUNCTIONAL-<app>.md")
+```
+
+Read `<knowledgeBasePath>/FUNCTIONAL-<app>.md` and find the `## Open Items` section.
+
+- If the section doesn't exist (an older `FUNCTIONAL-<app>.md` from before this section was introduced), tell the user to run `/second-brain-sync` once — it will add the section — and stop here.
 - If it says "No open items — all tracked features are up to date" (or equivalent), tell the user there's nothing incomplete to resume and stop here.
 - Otherwise, each line has the form `- [<status>] <Feature> — [<date> - <topic>](sessions/<filename>)`.
 
@@ -32,7 +38,7 @@ Present the entries from `## Open Items` as a list (feature, status, date/topic)
 
 - Read the full session report `<knowledgeBasePath>/sessions/<filename>`.
 - Read any spec/plan files linked from its "Superpowers artifacts" section(s).
-- Read the `### <Feature>` section in `FUNCTIONAL.md` for the current overall description of that feature.
+- Read the `### <Feature>` section in `FUNCTIONAL-<app>.md` for the current overall description of that feature.
 - If this report itself starts with a "Continues from" line, you may also skim the linked earlier session for additional background.
 
 ### 5. Check for staleness

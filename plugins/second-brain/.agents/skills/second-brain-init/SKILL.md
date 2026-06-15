@@ -22,7 +22,7 @@ Set up this repository to use a "second brain" knowledge base: a folder of markd
 
 If the existing config from Step 0 is not `none`, show the user its current `project`, `app`, and `knowledgeBasePath`, and ask whether they want to:
 - Keep it as-is (stop here), or
-- Update the project/app name or knowledge base path (go to step 3 with the new values, then re-run step 6 to rewrite the config — do not regenerate `FUNCTIONAL.md` from scratch; just confirm the target folders exist, creating any that are missing).
+- Update the project/app name or knowledge base path (go to step 3 with the new values, then re-run step 6 to rewrite the config — do not regenerate `FUNCTIONAL-<app>.md` from scratch; just confirm the target folders exist, creating any that are missing).
 
 If the existing config is `none`, continue to step 2.
 
@@ -47,9 +47,9 @@ Compute `knowledgeBasePath = <kb-root>/<project>/<app>`. Create it:
 mkdir -p "<knowledgeBasePath>/specs" "<knowledgeBasePath>/plans" "<knowledgeBasePath>/sessions"
 ```
 
-### 5. Generate FUNCTIONAL.md
+### 5. Generate the functional overview file
 
-Write `<knowledgeBasePath>/FUNCTIONAL.md` using this template, filled in from what you learned in step 2. Do not invent specs, plans, or session links — those are added by the second-brain-sync skill.
+Write `<knowledgeBasePath>/FUNCTIONAL-<app>.md` using this template, filled in from what you learned in step 2. Do not invent specs, plans, or session links — those are added by the second-brain-sync skill.
 
 ```markdown
 # <App Name> — Functional Overview
@@ -98,6 +98,6 @@ Check `.gitignore` for an entry covering `.claude/second-brain.json` (either dir
 
 Tell the user:
 - The knowledge base path created (`<knowledgeBasePath>`)
-- That `FUNCTIONAL.md` was created there
+- That `FUNCTIONAL-<app>.md` was created there
 - That `.claude/second-brain.json` was created and gitignored
 - That they can run the second-brain-sync skill at checkpoints to keep the knowledge base up to date

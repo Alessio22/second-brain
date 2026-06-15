@@ -4,15 +4,15 @@ A Claude Code plugin that saves your coding sessions as linked, navigable markdo
 
 ## What it does
 
-- `/second-brain-init` — one-time setup. Reads `CLAUDE.md` (or scans the codebase), asks where your knowledge base lives, and creates a `FUNCTIONAL.md` overview plus `specs/`, `plans/`, `sessions/` folders for this app.
-- `/second-brain-sync` — run at checkpoints (e.g. after finishing a feature). Writes a session report (what was done, why, key decisions, and a handoff section with status, next steps, and open questions so the work can be picked up in a future session) linked to the relevant feature, copies any new [superpowers](https://github.com/obra/superpowers) `docs/superpowers/specs|plans` files into the knowledge base, updates `FUNCTIONAL.md` to link to the latest spec/plan/session per feature, and rebuilds an "Open Items" index of every `in progress`/`blocked` feature — building up a cross-linked history you and future sessions can navigate.
-- `/second-brain-resume` — reads the "Open Items" index, lets you pick an `in progress` or `blocked` session, loads its report, linked specs/plans, and the relevant `FUNCTIONAL.md` section, warns you if the touched files have changed since, and offers to continue. Sessions resumed this way get linked as "Continues from" the next time they're synced, so a feature's history reads as one continuous thread.
+- `/second-brain-init` — one-time setup. Reads `CLAUDE.md` (or scans the codebase), asks where your knowledge base lives, and creates a `FUNCTIONAL-<app>.md` overview plus `specs/`, `plans/`, `sessions/` folders for this app.
+- `/second-brain-sync` — run at checkpoints (e.g. after finishing a feature). Writes a session report (what was done, why, key decisions, and a handoff section with status, next steps, and open questions so the work can be picked up in a future session) linked to the relevant feature, copies any new [superpowers](https://github.com/obra/superpowers) `docs/superpowers/specs|plans` files into the knowledge base, updates `FUNCTIONAL-<app>.md` to link to the latest spec/plan/session per feature, and rebuilds an "Open Items" index of every `in progress`/`blocked` feature — building up a cross-linked history you and future sessions can navigate.
+- `/second-brain-resume` — reads the "Open Items" index, lets you pick an `in progress` or `blocked` session, loads its report, linked specs/plans, and the relevant `FUNCTIONAL-<app>.md` section, warns you if the touched files have changed since, and offers to continue. Sessions resumed this way get linked as "Continues from" the next time they're synced, so a feature's history reads as one continuous thread.
 
 ## Layout produced
 
 ```
 <knowledge-base-root>/<project>/<app>/
-  FUNCTIONAL.md
+  FUNCTIONAL-<app>.md
   specs/2026-06-08-keycloak-auth-design.md
   plans/2026-06-08-keycloak-auth.md
   sessions/2026-06-12-keycloak-auth.md
