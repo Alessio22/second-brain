@@ -8,6 +8,8 @@ A Claude Code plugin that saves your coding sessions as linked, navigable markdo
 - `/second-brain-sync` — run at checkpoints (e.g. after finishing a feature). Writes a session report (what was done, why, key decisions, and a handoff section with status, next steps, and open questions so the work can be picked up in a future session) linked to the relevant feature, copies any new [superpowers](https://github.com/obra/superpowers) `docs/superpowers/specs|plans` files into the knowledge base, updates `FUNCTIONAL-<app>.md` to link to the latest spec/plan/session per feature, and rebuilds an "Open Items" index of every `in progress`/`blocked` feature — building up a cross-linked history you and future sessions can navigate.
 - `/second-brain-resume` — reads the "Open Items" index, lets you pick an `in progress` or `blocked` session, loads its report, linked specs/plans, and the relevant `FUNCTIONAL-<app>.md` section, warns you if the touched files have changed since, and offers to continue. Sessions resumed this way get linked as "Continues from" the next time they're synced, so a feature's history reads as one continuous thread.
 
+Claude Code also gets a `Stop` hook that reminds you to run `/second-brain-sync` (at most once per session) when it detects unsynced work — new commits, uncommitted changes, or new superpowers specs/plans not yet copied into the knowledge base. No setup needed beyond `/second-brain-init`.
+
 ## Layout produced
 
 ```
