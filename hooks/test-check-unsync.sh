@@ -82,6 +82,14 @@ output=$(run_hook "$dir" "session-$$-3")
 assert_no_output "synced state => silent" "$output"
 rm -rf "$dir" "$kb"
 
+# Test: empty repo (zero commits), lastSync=null => silent
+dir=$(setup_repo)
+kb=$(mktemp -d)
+write_config "$dir" "" "$kb"
+output=$(run_hook "$dir" "session-$$-4")
+assert_no_output "empty repo, no commits => silent" "$output"
+rm -rf "$dir" "$kb"
+
 if [ "$FAILURES" -eq 0 ]; then
   echo "All tests passed."
   exit 0

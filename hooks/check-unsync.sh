@@ -20,7 +20,7 @@ KB_PATH=$(jq -r '.knowledgeBasePath // empty' "$CONFIG")
 
 UNSYNCED=false
 
-HEAD_COMMIT=$(git -C "$CWD" rev-parse HEAD 2>/dev/null || echo "")
+HEAD_COMMIT=$(git -C "$CWD" rev-parse --verify -q HEAD 2>/dev/null || echo "")
 if [ -n "$HEAD_COMMIT" ] && [ "$HEAD_COMMIT" != "$LAST_SYNC_COMMIT" ]; then
   UNSYNCED=true
 fi
