@@ -27,7 +27,7 @@ There is no application code, build step, linter, or test suite — the entire "
 
 One-time setup linking a repo to a knowledge base folder. Reads `CLAUDE.md` (or scans the codebase if absent), asks the user for a project name, app name, and knowledge base root path, then:
 
-1. Creates `<knowledgeBasePath>/{specs,plans,sessions}/` (where `knowledgeBasePath = <kb-root>/<project>/<app>`).
+1. Creates `<knowledgeBasePath>/{specs,plans,sessions,scripts}/` (where `knowledgeBasePath = <kb-root>/<project>/<app>`).
 2. Generates `<knowledgeBasePath>/FUNCTIONAL-<app>.md` from a fixed template (Stack & Architecture + Open Items + Modules/Features sections).
 3. Writes `.claude/second-brain.json` with `{project, app, knowledgeBasePath, lastSync: null}`.
 4. Ensures `.claude/second-brain.json` is gitignored.
@@ -38,13 +38,13 @@ If a config already exists, it shows the current mapping and asks whether to kee
 
 Run at natural checkpoints (e.g. after finishing a feature). Reads `.claude/second-brain.json` (errors out telling the user to run `/second-brain-init` if missing), then:
 
-1. Gathers what changed: conversation context, `git log`/`git diff` since `lastSync.commit` (or recent history if `lastSync` is `null`), any `docs/superpowers/specs|plans` files not yet copied into the knowledge base, and — if this conversation began via `/second-brain-resume` — the resumed session's date/topic/filename for a "Continues from" link.
-2. Copies new spec/plan files into `<knowledgeBasePath>/specs/` and `.../plans/`, preserving filenames.
-3. Writes/appends a session report at `<knowledgeBasePath>/sessions/<date>-<slug>.md` (optional "Continues from" link, Summary, Decisions & rationale, Superpowers artifacts, Code changes, Handoff / Next steps).
+1. Gathers what changed: conversation context, `git log`/`git diff` since `lastSync.commit` (or recent history if `lastSync` is `null`), any `docs/superpowers/specs|plans` files not yet copied into the knowledge base, any untracked one-off script files (`.sh`/`.bash`/`.py`/`.rb`/`.js`/`.mjs`/`.ts`/`.ps1`/`.pl`) not yet copied into `<knowledgeBasePath>/scripts/`, and — if this conversation began via `/second-brain-resume` — the resumed session's date/topic/filename for a "Continues from" link.
+2. Copies new spec/plan files into `<knowledgeBasePath>/specs/` and `.../plans/`, preserving filenames; copies new script files into `<knowledgeBasePath>/scripts/` (flat, basename only, skipping any that already exist there).
+3. Writes/appends a session report at `<knowledgeBasePath>/sessions/<date>-<slug>.md` (optional "Continues from" link, Summary, Decisions & rationale, Superpowers artifacts, Code changes, Scripts, Handoff / Next steps).
 4. Updates `FUNCTIONAL-<app>.md`: for each touched feature, rewrites its section to describe the *current* state, its `Status` (`done`/`in progress`/`blocked`, from the session's Handoff section), and links the latest spec/plan/session (only the most recent session link per feature is kept — older ones stay reachable in `sessions/`).
 5. Rebuilds the `## Open Items` section by scanning **all** `### <Feature>` sections for `in progress`/`blocked` statuses (not just those touched this sync), adding the section if an older `FUNCTIONAL-<app>.md` doesn't have it yet.
 6. Rewrites `.claude/second-brain.json` with a new `lastSync.{timestamp, commit}`.
-7. If files were copied from `docs/superpowers/`, offers to delete the originals (only on explicit user confirmation).
+7. If files were copied from `docs/superpowers/` or one-off scripts were copied to `scripts/`, offers to delete the originals (only on explicit user confirmation).
 
 ### `/second-brain-resume`
 
@@ -63,7 +63,8 @@ Picks up work left `in progress` or `blocked` by a previous sync. Reads `.claude
 - `sync` and `resume` both migrate a legacy `FUNCTIONAL.md` (from before the app name was added to the filename) to `FUNCTIONAL-<app>.md` if found, before reading it. Keep this migration step identical across both commands and their Codex skill equivalents.
 - Every session report's "Handoff / Next steps" section must start with a `- Status: done|in progress|blocked` line — sync's "Rebuild the Open Items section" step relies on this exact `- Status:` prefix in each feature's `FUNCTIONAL-<app>.md` section (which is in turn copied from the session report).
 - The `## Open Items` section in `FUNCTIONAL-<app>.md` is the single source of truth `second-brain-resume.md` reads — it must be rebuilt on every sync from *all* feature sections' current `Status`/`Last session` lines, not just the ones touched that sync.
-- A session report's optional leading "Continues from: [...]" line must point to another file in the same `sessions/` folder (no `../`), unlike the spec/plan links lower in the same file (which use `../specs/...` / `../plans/...`).
-- Relative link paths must stay consistent with the actual layout: `<knowledgeBasePath>/{FUNCTIONAL-<app>.md, specs/, plans/, sessions/}` — session reports link out as `../specs/...` / `../plans/...`, while `FUNCTIONAL-<app>.md` links as `specs/...` / `plans/...` / `sessions/...`.
+- A session report's optional leading "Continues from: [...]" line must point to another file in the same `sessions/` folder (no `../`), unlike the spec/plan/script links lower in the same file (which use `../specs/...` / `../plans/...` / `../scripts/...`).
+- Relative link paths must stay consistent with the actual layout: `<knowledgeBasePath>/{FUNCTIONAL-<app>.md, specs/, plans/, sessions/, scripts/}` — session reports link out as `../specs/...` / `../plans/...` / `../scripts/...`, while `FUNCTIONAL-<app>.md` links as `specs/...` / `plans/...` / `sessions/...`.
+- A session report's `## Scripts` section is omitted entirely (not left empty) when no new scripts were copied that session — same convention as `## Superpowers artifacts`.
 - `.claude/second-brain.json` must always remain gitignored (it's a local, machine-specific path mapping).
 - All cross-references in generated knowledge-base files use plain relative markdown links, never Obsidian wikilinks, to keep the knowledge base portable.

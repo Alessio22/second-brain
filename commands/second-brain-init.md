@@ -40,7 +40,7 @@ Ask the user the following, one question at a time (multiple choice where sensib
 Compute `knowledgeBasePath = <kb-root>/<project>/<app>`. Create it:
 
 ```bash
-mkdir -p "<knowledgeBasePath>/specs" "<knowledgeBasePath>/plans" "<knowledgeBasePath>/sessions"
+mkdir -p "<knowledgeBasePath>/specs" "<knowledgeBasePath>/plans" "<knowledgeBasePath>/sessions" "<knowledgeBasePath>/scripts"
 ```
 
 ### 5. Generate the functional overview file
