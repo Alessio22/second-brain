@@ -29,6 +29,7 @@ Otherwise parse it for `project`, `app`, `knowledgeBasePath`, and `lastSync` (wh
   - Always also run `git diff HEAD --stat` to catch uncommitted changes.
   - If `lastSync` is `null` (first sync), run `git log -10 --oneline` and `git diff HEAD --stat` for a rough picture, leaning more on conversation context.
 - **New superpowers artifacts**: compare the "Superpowers specs/plans in repo" filenames above against what's already in `<knowledgeBasePath>/specs/` and `<knowledgeBasePath>/plans/` (run `ls` on those two folders). Any filename present in the repo lists but not in the knowledge base lists is "new".
+- **Handoff for the next session**: based on the conversation, determine the current status of the work (`done`, `in progress`, or `blocked`), the immediate next steps if any, and any open questions or blockers. This is what lets someone resume this work in a future session without re-reading the whole conversation.
 
 If there are no code changes, no new superpowers artifacts, and nothing meaningful was discussed/decided this session, tell the user there's nothing to sync and stop here.
 
@@ -81,6 +82,12 @@ Target file: `<knowledgeBasePath>/sessions/<date>-<slug>.md`.
 
 - `<path>` — <what changed and why>
 <one line per significant file from the git diff/log in step 2>
+
+## Handoff / Next steps
+
+- Status: <done | in progress | blocked>
+- Next steps: <what to pick up first in the next session, or "None — work is complete.">
+- Open questions / blockers: <anything unresolved, or "None.">
 ```
 
 - If this file **already exists** (a sync already happened today for this topic), append to it:
@@ -91,7 +98,7 @@ Target file: `<knowledgeBasePath>/sessions/<date>-<slug>.md`.
 
 ## Update — <current time as HH:MM>
 
-<same Summary / Decisions & rationale / Superpowers artifacts / Code changes structure, covering only what's new since the previous entry today>
+<same Summary / Decisions & rationale / Superpowers artifacts / Code changes / Handoff structure, covering only what's new since the previous entry today>
 ```
 
 ### 5. Update FUNCTIONAL.md
@@ -103,9 +110,10 @@ For each feature/module touched this session:
 - Find the existing `### <Feature>` section that matches by topic (use your judgement). If none matches, add a new `### <Feature>` section under `## Modules / Features`.
 - Rewrite that section's body to contain, in this order:
   1. A 2-3 sentence description of the **current** state of that feature (describe what it does now, not a changelog of today's changes).
-  2. `- Spec: [<title>](specs/<filename>)` — only if a spec exists for this feature (from this or a prior sync); update the link if a newer spec supersedes an older one.
-  3. `- Plan: [<title>](plans/<filename>)` — same rule as spec.
-  4. `- Last session: [<date> - <topic>](sessions/<filename>)` — always point to the session report from step 4, replacing any previous "Last session" line for this feature.
+  2. `- Status: <done | in progress | blocked>` — taken from the "Handoff / Next steps" section of the session report written in step 4; replace any previous "Status" line for this feature.
+  3. `- Spec: [<title>](specs/<filename>)` — only if a spec exists for this feature (from this or a prior sync); update the link if a newer spec supersedes an older one.
+  4. `- Plan: [<title>](plans/<filename>)` — same rule as spec.
+  5. `- Last session: [<date> - <topic>](sessions/<filename>)` — always point to the session report from step 4, replacing any previous "Last session" line for this feature.
 
 Only the latest session link per feature is kept in `FUNCTIONAL.md`; remove older ones (they remain reachable in the `sessions/` folder).
 
