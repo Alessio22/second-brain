@@ -90,6 +90,20 @@ output=$(run_hook "$dir" "session-$$-4")
 assert_no_output "empty repo, no commits => silent" "$output"
 rm -rf "$dir" "$kb"
 
+# Test: second call with same session_id => silent (already reminded)
+dir=$(setup_repo)
+echo "hello" > "$dir/file.txt"
+git -C "$dir" add file.txt
+git -C "$dir" commit -q -m "init"
+kb=$(mktemp -d)
+write_config "$dir" "" "$kb"
+sid="session-$$-4"
+run_hook "$dir" "$sid" > /dev/null
+output=$(run_hook "$dir" "$sid")
+assert_no_output "second call same session => silent" "$output"
+rm -f "/tmp/second-brain-reminded-$sid"
+rm -rf "$dir" "$kb"
+
 if [ "$FAILURES" -eq 0 ]; then
   echo "All tests passed."
   exit 0

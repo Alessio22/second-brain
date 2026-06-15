@@ -15,6 +15,9 @@ SESSION_ID=$(echo "$INPUT" | jq -r '.session_id // empty')
 CONFIG="$CWD/.claude/second-brain.json"
 [ -f "$CONFIG" ] || exit 0
 
+MARKER="/tmp/second-brain-reminded-$SESSION_ID"
+[ -f "$MARKER" ] && exit 0
+
 LAST_SYNC_COMMIT=$(jq -r '.lastSync.commit // empty' "$CONFIG")
 KB_PATH=$(jq -r '.knowledgeBasePath // empty' "$CONFIG")
 
@@ -26,6 +29,7 @@ if [ -n "$HEAD_COMMIT" ] && [ "$HEAD_COMMIT" != "$LAST_SYNC_COMMIT" ]; then
 fi
 
 if [ "$UNSYNCED" = true ]; then
+  touch "$MARKER"
   jq -n '{additionalContext: "Hai lavoro non sincronizzato nel second brain (nuovi commit, modifiche non committate, o nuove spec/piani superpowers). Valuta di eseguire /second-brain-sync prima di chiudere la sessione."}'
 fi
 
