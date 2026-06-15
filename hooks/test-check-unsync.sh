@@ -68,6 +68,7 @@ kb=$(mktemp -d)
 write_config "$dir" "" "$kb"
 output=$(run_hook "$dir" "session-$$-2")
 assert_reminder "new commit since lastSync=null => reminder" "$output"
+rm -f "/tmp/second-brain-reminded-session-$$-2"
 rm -rf "$dir" "$kb"
 
 # Test: HEAD == lastSync.commit, no other changes => silent
