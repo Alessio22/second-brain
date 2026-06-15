@@ -60,6 +60,10 @@ Write `<knowledgeBasePath>/FUNCTIONAL.md` using this template, filled in from wh
 
 <2-5 sentences: language/framework, key libraries, high-level structure>
 
+## Open Items
+
+No open items — all tracked features are up to date.
+
 ## Modules / Features
 
 ### Overview

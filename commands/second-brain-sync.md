@@ -30,6 +30,7 @@ Otherwise parse it for `project`, `app`, `knowledgeBasePath`, and `lastSync` (wh
   - If `lastSync` is `null` (first sync), run `git log -10 --oneline` and `git diff HEAD --stat` for a rough picture, leaning more on conversation context.
 - **New superpowers artifacts**: compare the "Superpowers specs/plans in repo" filenames above against what's already in `<knowledgeBasePath>/specs/` and `<knowledgeBasePath>/plans/` (run `ls` on those two folders). Any filename present in the repo lists but not in the knowledge base lists is "new".
 - **Handoff for the next session**: based on the conversation, determine the current status of the work (`done`, `in progress`, or `blocked`), the immediate next steps if any, and any open questions or blockers. This is what lets someone resume this work in a future session without re-reading the whole conversation.
+- **Continuation link**: if this conversation began with `/second-brain-resume` loading a previous session report, note that report's date, topic, and filename — the new report should link back to it as "Continues from".
 
 If there are no code changes, no new superpowers artifacts, and nothing meaningful was discussed/decided this session, tell the user there's nothing to sync and stop here.
 
@@ -59,6 +60,8 @@ Target file: `<knowledgeBasePath>/sessions/<date>-<slug>.md`.
 
 ```markdown
 # Session: <Topic> — <date>
+
+<if this conversation began by resuming a previous session via `/second-brain-resume`, add this line here: "Continues from: [<date> - <topic>](<filename>)" (relative to this file, so same `sessions/` folder — no `../`). Omit this line otherwise.>
 
 ## Summary
 
@@ -116,6 +119,14 @@ For each feature/module touched this session:
   5. `- Last session: [<date> - <topic>](sessions/<filename>)` — always point to the session report from step 4, replacing any previous "Last session" line for this feature.
 
 Only the latest session link per feature is kept in `FUNCTIONAL.md`; remove older ones (they remain reachable in the `sessions/` folder).
+
+### 5b. Rebuild the Open Items section
+
+Regenerate the `## Open Items` section (positioned after `## Stack & Architecture` and before `## Modules / Features` — add it there if it doesn't exist yet, e.g. in a `FUNCTIONAL.md` written before this section existed):
+
+- Scan **all** `### <Feature>` sections (not just the ones touched this sync) for their `- Status:` and `- Last session:` lines.
+- For each feature whose status is `in progress` or `blocked`, add a line: `- [<status>] <Feature> — [<date> - <topic>](sessions/<filename>)` (reuse that feature's "Last session" link).
+- If no feature is `in progress` or `blocked`, write a single line: "No open items — all tracked features are up to date."
 
 Write the updated `FUNCTIONAL.md` back.
 

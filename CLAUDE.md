@@ -27,7 +27,7 @@ There is no application code, build step, linter, or test suite — the entire "
 One-time setup linking a repo to a knowledge base folder. Reads `CLAUDE.md` (or scans the codebase if absent), asks the user for a project name, app name, and knowledge base root path, then:
 
 1. Creates `<knowledgeBasePath>/{specs,plans,sessions}/` (where `knowledgeBasePath = <kb-root>/<project>/<app>`).
-2. Generates `<knowledgeBasePath>/FUNCTIONAL.md` from a fixed template (Stack & Architecture + Modules/Features sections).
+2. Generates `<knowledgeBasePath>/FUNCTIONAL.md` from a fixed template (Stack & Architecture + Open Items + Modules/Features sections).
 3. Writes `.claude/second-brain.json` with `{project, app, knowledgeBasePath, lastSync: null}`.
 4. Ensures `.claude/second-brain.json` is gitignored.
 
@@ -37,27 +37,31 @@ If a config already exists, it shows the current mapping and asks whether to kee
 
 Run at natural checkpoints (e.g. after finishing a feature). Reads `.claude/second-brain.json` (errors out telling the user to run `/second-brain-init` if missing), then:
 
-1. Gathers what changed: conversation context, `git log`/`git diff` since `lastSync.commit` (or recent history if `lastSync` is `null`), and any `docs/superpowers/specs|plans` files not yet copied into the knowledge base.
+1. Gathers what changed: conversation context, `git log`/`git diff` since `lastSync.commit` (or recent history if `lastSync` is `null`), any `docs/superpowers/specs|plans` files not yet copied into the knowledge base, and — if this conversation began via `/second-brain-resume` — the resumed session's date/topic/filename for a "Continues from" link.
 2. Copies new spec/plan files into `<knowledgeBasePath>/specs/` and `.../plans/`, preserving filenames.
-3. Writes/appends a session report at `<knowledgeBasePath>/sessions/<date>-<slug>.md` (Summary, Decisions & rationale, Superpowers artifacts, Code changes, Handoff / Next steps).
+3. Writes/appends a session report at `<knowledgeBasePath>/sessions/<date>-<slug>.md` (optional "Continues from" link, Summary, Decisions & rationale, Superpowers artifacts, Code changes, Handoff / Next steps).
 4. Updates `FUNCTIONAL.md`: for each touched feature, rewrites its section to describe the *current* state, its `Status` (`done`/`in progress`/`blocked`, from the session's Handoff section), and links the latest spec/plan/session (only the most recent session link per feature is kept — older ones stay reachable in `sessions/`).
-5. Rewrites `.claude/second-brain.json` with a new `lastSync.{timestamp, commit}`.
-6. If files were copied from `docs/superpowers/`, offers to delete the originals (only on explicit user confirmation).
+5. Rebuilds the `## Open Items` section by scanning **all** `### <Feature>` sections for `in progress`/`blocked` statuses (not just those touched this sync), adding the section if an older `FUNCTIONAL.md` doesn't have it yet.
+6. Rewrites `.claude/second-brain.json` with a new `lastSync.{timestamp, commit}`.
+7. If files were copied from `docs/superpowers/`, offers to delete the originals (only on explicit user confirmation).
 
 ### `/second-brain-resume`
 
 Picks up work left `in progress` or `blocked` by a previous sync. Reads `.claude/second-brain.json` (errors out telling the user to run `/second-brain-init` if missing), then:
 
-1. Scans `<knowledgeBasePath>/sessions/*.md` and, for each file, takes the **last** `- Status:` line (sessions may have multiple `## Update — HH:MM` blocks; only the most recent status counts).
-2. Lists the sessions whose last status is `in progress` or `blocked` and asks the user to pick one.
+1. Reads the `## Open Items` section of `FUNCTIONAL.md` (each line: `- [<status>] <Feature> — [<date> - <topic>](sessions/<filename>)`). If the section is missing, tells the user to run `/second-brain-sync` once to generate it.
+2. Lists those entries and asks the user to pick one.
 3. Loads full context for the chosen session: the session report itself, any linked spec/plan files, and the matching `### <Feature>` section in `FUNCTIONAL.md`.
-4. Summarizes status, next steps, and open questions/blockers, and offers to continue.
+4. Checks for staleness: runs `git log --since=<session date>` against the files listed in "Code changes" and warns if they've changed since.
+5. Summarizes status, next steps, open questions/blockers, and any staleness warning, and offers to continue — noting that a future sync should link back here as "Continues from".
 
 ## Key invariants when editing these commands
 
 - The `second-brain.json` schema — `{project, app, knowledgeBasePath, lastSync: {timestamp, commit} | null}` — must stay identical across `second-brain-init.md`, `second-brain-sync.md`, and `second-brain-resume.md`.
-- The `FUNCTIONAL.md` template structure (`## Stack & Architecture`, `## Modules / Features`, `### <Feature>` sections) produced by init must match what sync expects to find and edit, and what resume expects to read.
-- Every session report's "Handoff / Next steps" section must start with a `- Status: done|in progress|blocked` line — `second-brain-resume.md` greps for this exact `^- Status:` prefix to find resumable sessions.
+- The `FUNCTIONAL.md` template structure (`## Stack & Architecture`, `## Open Items`, `## Modules / Features`, `### <Feature>` sections) produced by init must match what sync expects to find and edit, and what resume expects to read.
+- Every session report's "Handoff / Next steps" section must start with a `- Status: done|in progress|blocked` line — sync's "Rebuild the Open Items section" step relies on this exact `- Status:` prefix in each feature's `FUNCTIONAL.md` section (which is in turn copied from the session report).
+- The `## Open Items` section in `FUNCTIONAL.md` is the single source of truth `second-brain-resume.md` reads — it must be rebuilt on every sync from *all* feature sections' current `Status`/`Last session` lines, not just the ones touched that sync.
+- A session report's optional leading "Continues from: [...]" line must point to another file in the same `sessions/` folder (no `../`), unlike the spec/plan links lower in the same file (which use `../specs/...` / `../plans/...`).
 - Relative link paths must stay consistent with the actual layout: `<knowledgeBasePath>/{FUNCTIONAL.md, specs/, plans/, sessions/}` — session reports link out as `../specs/...` / `../plans/...`, while `FUNCTIONAL.md` links as `specs/...` / `plans/...` / `sessions/...`.
 - `.claude/second-brain.json` must always remain gitignored (it's a local, machine-specific path mapping).
 - All cross-references in generated knowledge-base files use plain relative markdown links, never Obsidian wikilinks, to keep the knowledge base portable.
