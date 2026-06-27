@@ -15,6 +15,8 @@ git branch --show-current 2>/dev/null   # current branch
 date +%F   # today's date
 ls docs/superpowers/specs/ 2>/dev/null || echo "none"   # superpowers specs in repo
 ls docs/superpowers/plans/ 2>/dev/null || echo "none"   # superpowers plans in repo
+test -f CLAUDE.md && echo "yes" || echo "no"     # CLAUDE.md present
+test -f .claude/memory.md && echo "yes" || echo "no"   # memory.md present
 ```
 
 ## Your task
@@ -66,6 +68,22 @@ cp "<path-from-git-status>" "<knowledgeBasePath>/scripts/<basename>"
 
 Copy flat (basename only). If a file with that basename already exists at the destination, skip it.
 
+### 3b. Copy Claude config files
+
+These files are always overwritten at the destination — they change over time and the KB should always hold the latest version.
+
+If CLAUDE.md is present (output was `yes` in Step 0):
+
+```bash
+cp "CLAUDE.md" "<knowledgeBasePath>/CLAUDE.md"
+```
+
+If `.claude/memory.md` is present (output was `yes` in Step 0):
+
+```bash
+cp ".claude/memory.md" "<knowledgeBasePath>/memory.md"
+```
+
 ### 4. Write the session report
 
 Pick a short kebab-case slug summarizing the session topic (e.g. `keycloak-auth`). Use the "Today's date" from Step 0 as `<date>`.
@@ -108,6 +126,13 @@ Target file: `<knowledgeBasePath>/sessions/<date>-<slug>.md`.
 
 <omit this entire section if no new scripts were copied in step 3>
 
+## Claude config
+
+- `CLAUDE.md` — copied to `<knowledgeBasePath>/CLAUDE.md`
+- `.claude/memory.md` — copied to `<knowledgeBasePath>/memory.md`
+
+<omit lines for files that were not present; omit this entire section if neither was copied in step 3b>
+
 ## Handoff / Next steps
 
 - Status: <done | in progress | blocked>
@@ -148,6 +173,21 @@ For each feature/module touched this session:
   5. `- Last session: [<date> - <topic>](sessions/<filename>)` — always point to the session report from step 4, replacing any previous "Last session" line for this feature.
 
 Only the latest session link per feature is kept in `FUNCTIONAL-<app>.md`; remove older ones (they remain reachable in the `sessions/` folder).
+
+### 5a. Maintain the Configurazione Claude section
+
+Check whether `FUNCTIONAL-<app>.md` already contains a `## Configurazione Claude` section (positioned between `## Stack & Architecture` and `## Open Items`). If not, add it. If it exists, update it.
+
+The section content should list only the files that were actually copied in step 3b:
+
+```markdown
+## Configurazione Claude
+
+- [CLAUDE.md](CLAUDE.md) — istruzioni persistenti del progetto
+- [memory.md](memory.md) — memoria accumulata tra sessioni
+```
+
+Omit a line if the corresponding file was not copied (e.g. omit the `memory.md` line if `.claude/memory.md` was not present in the repo).
 
 ### 5b. Rebuild the Open Items section
 
