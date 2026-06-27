@@ -1,7 +1,7 @@
 {
   "name": "second-brain",
   "description": "Turn superpowers specs, plans, and session decisions into a portable, linked second-brain knowledge base per project.",
-  "version": "0.4.0",
+  "version": "0.6.0",
   "author": {
     "name": "Alessio Canestrelli"
   },

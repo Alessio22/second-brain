@@ -187,7 +187,7 @@ The section content should list only the files that were actually copied in step
 - [memory.md](memory.md) — memoria accumulata tra sessioni
 ```
 
-Omit a line if the corresponding file was not copied (e.g. omit the `memory.md` line if `.claude/memory.md` was not present in the repo).
+Omit a line if the corresponding file was not copied (e.g. omit the `memory.md` line if `.claude/memory.md` was not present in the repo). If neither file was copied in step 3b, omit the `## Configurazione Claude` section entirely — do not write it as an empty section. If the section already exists in `FUNCTIONAL-<app>.md` from a previous sync and both files are now absent, remove it.
 
 ### 5b. Rebuild the Open Items section
 
